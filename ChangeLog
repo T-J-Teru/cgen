@@ -1,5 +1,9 @@
 2016-03-02  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* .gitignore: Add autom4te.cache pattern.
+
+2016-03-02  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* enum.scm (enum-sequential?): Rename to...
 	(/enum-sequential?): ...this.
 	(gen-enum-decl): Update call for new name /enum-sequential?.
