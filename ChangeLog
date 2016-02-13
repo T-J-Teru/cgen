@@ -1,3 +1,9 @@
+2016-03-02  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* enum.scm (enum-sequential?): Rename to...
+	(/enum-sequential?): ...this.
+	(gen-enum-decl): Update call for new name /enum-sequential?.
+
 2021-02-01  Mike Frysinger  <vapier@gentoo.org>
 
 	* sim-decode.scm (TRACE_EXTRACT): Rename to ...

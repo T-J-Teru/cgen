@@ -217,7 +217,7 @@
 ; FIXME: Doesn't handle gaps in specified values.
 ; e.g. (sym1 val1) sym2 (sym3 val3)
 
-(define (enum-sequential? vals)
+(define (/enum-sequential? vals)
   (let loop ((last -1) (remaining vals))
     (if (null? remaining)
 	#t
@@ -254,7 +254,7 @@
      (string-downcase (gen-c-symbol name))
      " {")
     (let loop ((n 0) ; `n' is used to track the number of entries per line only
-	       (sequential? (enum-sequential? vals))
+	       (sequential? (/enum-sequential? vals))
 	       (vals vals)
 	       (result (list "")))
       (if (null? vals)
