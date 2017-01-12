@@ -211,6 +211,48 @@ const char *
 }\n\n")
 )
 
+(define (/gen-validate-switch)
+  (logit 2 "Generating validation switch ...\n")
+  (string-list
+   "\
+int @arch@_cgen_validate_operand
+  (CGEN_CPU_DESC, int, CGEN_EXTRACT_INFO *, CGEN_INSN_INT, CGEN_FIELDS *, bfd_vma);
+
+/* Main entry point for operand validation (after extraction).
+   The result is 0 for error, !0 for success.
+   ??? Actual values aren't well defined right now.
+
+   This function is basically just a big switch statement.  For now we
+   validate all operands, but in the future this should probably change
+   so we only validate specific operands that we mark in the CPU file.  */
+
+int
+@arch@_cgen_validate_operand (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			      int opindex,
+			      CGEN_EXTRACT_INFO *ex_info ATTRIBUTE_UNUSED,
+			      CGEN_INSN_INT insn_value ATTRIBUTE_UNUSED,
+			      CGEN_FIELDS * fields ATTRIBUTE_UNUSED,
+			      bfd_vma pc ATTRIBUTE_UNUSED)
+{
+  int valid = 1; /* Assume valid.  */
+
+  switch (opindex)
+    {
+"
+   (gen-switch 'validate)
+"
+    default :
+      /* xgettext:c-format */
+      fprintf (stderr, _(\"Unrecognized field %d while decoding insn.\\n\"),
+	       opindex);
+      abort ();
+    }
+
+  /* Assume success.  */
+  return valid;
+}\n\n")
+)
+
 (define (/gen-extract-switch)
   (logit 2 "Generating extract switch ...\n")
   (string-list
@@ -257,6 +299,9 @@ int
 	 opindex);
       abort ();
     }
+
+  if (!@arch@_cgen_validate_operand (cd, opindex, ex_info, insn_value, fields, pc))
+    return -1;
 
   return length;
 }\n\n")
@@ -318,6 +363,7 @@ void
    ; No need for copyright, appended to file with one.
    "\n"
    /gen-insert-switch
+   /gen-validate-switch
    /gen-extract-switch
    (lambda () (gen-handler-table "insert" opc-insert-handlers))
    (lambda () (gen-handler-table "extract" opc-extract-handlers))

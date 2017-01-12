@@ -1,3 +1,14 @@
+2017-01-12  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* opc-ibld.scm (/gen-validate-switch): New function.
+	(/gen-extract-switch): Add call to C function created by
+	/gen-validate-switch.
+	(cgen-ibld.in) Call /gen-validate-switch.
+	* opcodes.scm: Add gen-validate methods for <ifield>,
+	<multi-ifield>, <derived-ifield>, <hw-index>, <hw-asm>, <keyword>,
+	<hw-register>, <hw-immediate>, <hw-address>, <operand>, and
+	<derived-operand>
+
 2016-03-02  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* .gitignore: Add autom4te.cache pattern.

@@ -223,6 +223,12 @@
 			 "      }\n")
 	  "")
       )))
+ )
+
+(method-make!
+ <ifield> 'gen-validate
+ (lambda (self operand)
+   "      /* <ifield>::gen-extract */\n")
 )
 
 ; gen-insert of multi-ifields
@@ -303,11 +309,22 @@
       )))
 )
 
+(method-make!
+ <multi-ifield> 'gen-validate
+ (lambda (self operand)
+   "      /* <multi-ifield>::gen-extract */\n")
+)
 
 (method-make!
  <derived-operand> 'gen-extract
  (lambda (self operand)
    "      abort();\n")
+)
+
+(method-make!
+ <derived-ifield> 'gen-validate
+ (lambda (self operand)
+   "      /* <derived-ifield>::gen-extract */\n")
 )
 
 ;(method-make!
@@ -346,6 +363,19 @@
       (send (hw-index:value self) 'gen-extract operand))
      (else
       ""))))
+
+(method-make!
+ <hw-index> 'gen-validate
+ (lambda (self operand)
+   (string-append
+    "      /* <hw-index>::gen-validate */\n"
+    (case (hw-index:type self)
+      ((ifield)
+       (send (hw-index:value self) 'gen-validate operand))
+      (else
+       ""))))
+)
+
 
 ; HW-ASM is the base class for supporting hardware elements in the opcode table
 ; (aka assembler/disassembler).
@@ -463,6 +493,14 @@
       ", pc, length"
       ");\n"
       )))
+ )
+
+; Default method to emit C code to validate a hardware element.
+
+(method-make!
+ <hw-asm> 'gen-validate
+ (lambda (self operand)
+   "      valid = 1;\n")
 )
 
 ; Keyword support.
@@ -512,14 +550,36 @@
       (gen-bool-attrs (obj-atlist operand) gen-attr-mask)
       ");\n"
       )))
+ )
+
+; Return C code to validate a keyword
+
+(method-make!
+ <keyword> 'gen-validate
+ (lambda (self operand)
+   (let ((value
+	  (case (hw-index:type (op:index operand))
+	    ((ifield) (gen-operand-result-var (op-ifield operand)))
+	    (else "0"))))
+     (string-append
+      "      /* <keyword>::gen-validate */\n"
+      "      valid = validate_keyword (cd, ex_info, "
+      (send self 'gen-ref) ", " value
+      ", "
+      ;; We explicitly pass the attributes here rather than look them up
+      ;; to give the code more optimization opportunities.
+      (gen-bool-attrs (obj-atlist operand) gen-attr-mask)
+      ");\n"
+      )))
 )
+
 
 ; Hardware support.
 
 ; For registers, use the indices field.  Ignore values.
 ; ??? Not that that will always be the case.
 
-(method-make-forward! <hw-register> 'indices '(gen-parse gen-print))
+(method-make-forward! <hw-register> 'indices '(gen-parse gen-print gen-validate))
 
 ; No such support for memory yet.
 
@@ -540,9 +600,15 @@
 
 (method-make-forward! <hw-immediate> 'values '(gen-parse gen-print))
 
+(method-make!
+ <hw-immediate> 'gen-validate
+ (lambda (self operand)
+   "      valid = 1;\n")
+)
+
 ; For addresses, use the values field.  Ignore indices.
 
-(method-make-forward! <hw-address> 'values '(gen-parse gen-print))
+(method-make-forward! <hw-address> 'values '(gen-parse gen-print gen-validate))
 
 ; Generate the C code for dealing with operands.
 ; This code is inserted into cgen-{ibld,asm,dis}.in above the insn routines
@@ -684,7 +750,19 @@
 )
 
 (method-make!
+ <operand> 'gen-validate
+ (lambda (self operand)
+   (send (op:type self) 'gen-validate operand))
+)
+
+(method-make!
  <derived-operand> 'gen-print
+ (lambda (self operand)
+   "      abort();\n") ; should never be called
+)
+
+(method-make!
+ <derived-operand> 'gen-validate
  (lambda (self operand)
    "      abort();\n") ; should never be called
 )
