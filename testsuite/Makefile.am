@@ -18,7 +18,7 @@
 # <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = 1.9 cygnus
+AUTOMAKE_OPTIONS = foreign
 
 cgendir = $(srcdir)/..
 

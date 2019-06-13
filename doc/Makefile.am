@@ -17,7 +17,7 @@
 # <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = cygnus
+AUTOMAKE_OPTIONS = foreign info-in-builddir no-texinfo.tex
 
 # List of files that go into cgen.info.
 DOCFILES = app.texi cgen.texi credits.texi glossary.texi intro.texi \
@@ -39,11 +39,3 @@ noinst_TEXINFOS = cgen.texi cgenint.texi
 # Maintenance
 
 MAINTAINERCLEANFILES = cgen.info cgenint.info
-
-# Automake 1.9 will only build info files in the objdir if they are
-# mentioned in DISTCLEANFILES.  It doesn't have to be unconditional,
-# though, so we use a bogus condition.
-# NOTE: This is copied from gas.
-if GENINSRC_NEVER
-DISTCLEANFILES = cgen.info cgenint.info
-endif

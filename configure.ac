@@ -18,10 +18,11 @@ dnl <http://www.gnu.org/licenses/>.
 dnl
 
 AC_PREREQ(2.59)
-AC_INIT(read.scm)
-AC_CANONICAL_SYSTEM
 dnl The "50" is a generic indicator that we're between 1.1 and 1.2.
-AM_INIT_AUTOMAKE(cgen, 1.1.50)
+AC_INIT(cgen, 1.1.50)
+AC_CONFIG_SRCDIR(read.scm)
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE
 
 AC_PROG_INSTALL
 AC_EXEEXT
