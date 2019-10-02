@@ -19,13 +19,26 @@
 # <http://www.gnu.org/licenses/>.
 #
 
-# Run this script in the src/cgen directory.
-
 # Exit on any error.
 set -e
 
 # For debugging.
 set -x
+
+# If the cgen directory has been checked out inside binutils-gdb as
+# binutils-gdb/cgen, then this script requires no arguments.
+# Otherwise, provide the path to the binutils-gdb source directory.
+binutils_gdb_src=$1
+if [ -z "$binutils_gdb_src" ]
+then
+    if [ -d ../opcodes ]
+    then
+        binutils_gdb_src=$(cd .. && pwd)
+    else
+        echo "Couldn't find binutils-gdb/opcodes directory" >& 2
+        exit 1
+    fi
+fi
 
 if [ ! -f sim.scm ]
 then
@@ -41,5 +54,5 @@ mkdir $builddir
 export cgendir=`pwd`
 
 cd $builddir
-$cgendir/../opcodes/configure --prefix /tmp/junk --target m32r-elf --enable-targets=all
+$binutils_gdb_src/opcodes/configure --prefix /tmp/junk --target m32r-elf --enable-targets=all --enable-cgen-maint=$cgendir
 make run-cgen-all

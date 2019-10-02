@@ -100,12 +100,16 @@
 )
 
 ; Use the debugging evaluator.
-(if (not (defined? 'DEBUG-EVAL))
-    (define DEBUG-EVAL #t))
+(define DEBUG-EVAL
+  (if (not (defined? 'DEBUG-EVAL))
+      #t
+      DEBUG-EVAL))
 
 ; Tell maybe-load to always load the file.
-(if (not (defined? 'CHECK-LOADED?))
-    (define CHECK-LOADED? #f))
+(define CHECK-LOADED?
+  (if (not (defined? 'CHECK-LOADED?))
+      #f
+      CHECK-LOADED?))
 
 (display "
 
