@@ -166,7 +166,7 @@
 
 (load "rtx-funcs")
 
-(debug-repl nil)
+;; (debug-repl nil)
 
 (load "rtl-c")
 (load "semantics")
@@ -1273,6 +1273,7 @@ Define a preprocessor-style macro.
 
 (define /cgen
   (lambda args
+    (display "APB: Entering /cgen\n\n\n")
     (let ((app-name "unknown")
 	  (opt-spec nil)
 	  (app-init! (lambda () #f))
@@ -1339,7 +1340,8 @@ Define a preprocessor-style macro.
 		     ((str=? "-d" (car opt))
 		      (let ((prompt (string-append "cgen-" app-name "> ")))
 			(set! repl? #t)
-			(set-repl-prompt! prompt)
+                        (repl-default-prompt-set! prompt)
+			;;(set-repl-prompt! prompt)
 			(if (feature? 'readline)
 			    (set-readline-prompt! prompt))
 			))
