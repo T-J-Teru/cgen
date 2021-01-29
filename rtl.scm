@@ -283,12 +283,12 @@
       *UNSPECIFIED*))
 )
 
-(define define-rtx-node
-  ; Written this way so Hobbit can handle it.
-  (defmacro:syntax-transformer (lambda arg-list
-				 (apply def-rtx-node arg-list)
-				 nil))
-)
+;(define (define-rtx-node arg-list)
+;  ;; Written this way so Hobbit can handle it.
+ ; (defmacro:syntax-transformer (lambda arg-list
+ ;                                (apply def-rtx-node arg-list)
+;                                 nil))
+;)
 
 ; Same as define-rtx-node but don't pre-evaluate the arguments.
 ; Remember that `mode' must be the first argument.
@@ -314,18 +314,16 @@
       *UNSPECIFIED*))
 )
 
-(define define-rtx-syntax-node
-  ; Written this way so Hobbit can handle it.
-  (defmacro:syntax-transformer (lambda arg-list
-				 (apply def-rtx-syntax-node arg-list)
-				 nil))
+(define (define-rtx-syntax-node arg-list)
+  (apply def-rtx-syntax-node arg-list)
 )
 
 ; Same as define-rtx-node but return an operand (usually an <operand> object).
 ; ??? `mode' must be the first argument?
 
 (define (def-rtx-operand-node name-args result-mode arg-types arg-modes class action)
-  ; Operand nodes must specify an action.
+  ;; Operand nodes must specify an action.
+  (display "APB: xxx")
   (assert action)
   (let ((name (car name-args))
 	(args (cdr name-args))
@@ -345,12 +343,31 @@
       *UNSPECIFIED*))
 )
 
-(define define-rtx-operand-node
-  ; Written this way so Hobbit can handle it.
-  (defmacro:syntax-transformer (lambda arg-list
-				 (apply def-rtx-operand-node arg-list)
-				 nil))
-)
+;(define (define-rtx-operand-node arg-list)
+;  (def-rtx-operand-node arg-list)
+;)
+
+;; (define-syntax define-rtx-operand-node
+;;   (syntax-rules ()
+;;     ((define-rtx-operand-node args ...)
+;;      (display args ...))))
+
+;;     (apply def-rtx-operand-node `(name-args result-mode arg-types arg-modes class action)))))
+
+;(define define-rtx-operand-node
+;  ; Written this way so Hobbit can handle it.
+;  (defmacro:syntax-transformer (lambda arg-list
+;                                (apply def-rtx-operand-node arg-list)
+                                        ;                               nil)))
+
+(defmacro define-rtx-operand-node arg-list
+  (display "APB"))
+;;  (apply def-rtx-operand-node arg-list))
+
+;(define-syntax define-rtx-operand-node
+ ; (syntax-rules ()
+  ;  ((define-rtx-operand-node name-args result-mode arg-types arg-modes class action)
+   ; (def-rtx-operand-node '() result-mode '() '() class action))))
 
 ; Convert one rtx expression into another.
 ; NAME-ARGS is a list of the operation name and arguments.
@@ -358,28 +375,41 @@
 ; The result of ACTION must be another rtx expression (a list).
 
 (define (def-rtx-macro-node name-args action)
-  ; macro nodes must specify an action
+  ;; macro nodes must specify an action
+  (display "In def-rtx-macro-node <1>\n")
+  (display name-args)
+  (display action)
+  (newline)
   (assert action)
+  (display "In def-rtx-macro-node <2>\n")
   (let ((name (car name-args))
 	(args (cdr name-args)))
+    (display "In def-rtx-macro-node <3>\n")
     (let ((rtx (make <rtx-func> name args #f #f #f #f
 		     #f ; class
 		     'macro
 		     (eval1 (list 'lambda args action))
 		     /rtx-num-next)))
       ; Add it to the table of rtx macros.
+      (display "In def-rtx-macro-node <3>\n")
+      (display /rtx-macro-table)
+               
       (hashq-set! /rtx-macro-table name rtx)
+      (display "In def-rtx-macro-node <4>\n")
       (set! /rtx-num-next (+ /rtx-num-next 1))
+      (display "In def-rtx-macro-node <5>\n")
       (set! /rtx-name-list (cons name /rtx-name-list))
-      *UNSPECIFIED*))
+      (display "In def-rtx-macro-node <6>\n")
+      *UNSPECIFIED*
+      ))
 )
 
-(define define-rtx-macro-node
-  ; Written this way so Hobbit can handle it.
-  (defmacro:syntax-transformer (lambda arg-list
-				 (apply def-rtx-macro-node arg-list)
-				 nil))
-)
+(define (define-rtx-macro-node arg-list)
+  (apply def-rtx-macro-node arg-list))
+
+;(defmacro define-rtx-macro-node arg-list
+;  (apply def-rtx-macro-node arg-list))
+
 
 ; RTL macro expansion.
 ; RTL macros are different than pmacros.  The difference is that the expansion

@@ -10,8 +10,11 @@
 ; Load the various support routines.
 
 (define (load-files srcdir)
+  (display "APB: Loading read.scm\n")
   (load (string-append srcdir "/read.scm"))
+  (display "APB: Loading desc.scm\n")
   (load (string-append srcdir "/desc.scm"))
+  (display "APB: Loading desc-cpu.scm\n")
   (load (string-append srcdir "/desc-cpu.scm"))
   (load (string-append srcdir "/opcodes.scm"))
   (load (string-append srcdir "/opc-asmdis.scm"))
@@ -88,11 +91,16 @@
 (define (cgen-opc argv)
   (let ()
 
+    (display "APB: Starting up...\n")
+
     ; Find and set srcdir, then load all Scheme code.
     ; Drop the first argument, it is the script name (i.e. argv[0]).
     (set! srcdir (find-srcdir (cdr argv)))
     (set! %load-path (cons srcdir %load-path))
+    (display "APB: load files...\n")
     (load-files srcdir)
+
+    (display "APB: Displaying argv...\n")
 
     (display-argv argv)
 

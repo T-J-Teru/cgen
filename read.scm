@@ -148,15 +148,34 @@
 (load "insn")
 (load "minsn")
 (load "decode")
+
+(display "APB: Now the hard part...\n")
+
+
 (load "rtl")
 (load "rtl-traverse")
 (load "rtl-xform")
+
+;; START DEBUG CODE
+;;(set! /rtx-func-table (make-hash-table 127))
+;;(set! /rtx-macro-table (make-hash-table 127))
+;;(set! /rtx-num-next 0)
+;; (debug-repl nil)
+;; At the repl, run: (define-rtx-macro-node (regno reg) (list 'index-of reg))
+;; END DEBUG CODE
+
 (load "rtx-funcs")
+
+(debug-repl nil)
+
 (load "rtl-c")
 (load "semantics")
 (load "sem-frags")
 (load "utils-gen")
 (load "pgmr-tools")
+
+(display "APB: All loading done\n")
+
 
 ;; Reader state data.
 ;; All state regarding the reading of a .cpu file is kept in an object of

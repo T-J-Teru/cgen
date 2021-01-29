@@ -238,6 +238,8 @@
 ;      (s-hw *estate* mode hw-elm indx selector)
 ;)
 
+(display "APB: <aaa>")
+
 ; Register accesses.
 ; INDX-SEL is an optional index and possible selector.
 (define-rtx-operand-node (reg &options &mode hw-elm . indx-sel)
