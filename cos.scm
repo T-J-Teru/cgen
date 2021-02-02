@@ -904,19 +904,6 @@
 	(/object-error "elm-bound?" obj "element not present: " elm-name)))
 )
 
-;; Subroutine of elm-get.
-
-(define (/elm-make-method-getter self elm-name)
-  (/object-check self "elm-get")
-  (let ((index (/class-lookup-element (/object-class-desc self) elm-name)))
-    (if index
-	(procedure->memoizing-macro
-	 (lambda (exp env)
-	   `(lambda (obj)
-	      (/object-elm-get obj ,index))))
-	(/object-error "elm-get" self "element not present: " elm-name)))
-)
-
 ;; Get an element from an object.
 ;; If OBJ is `self' then the caller is required to be a method and we emit
 ;; memoized code.  Otherwise we do things the slow way.
@@ -930,33 +917,14 @@
 ;; operation with O(1).  Cute, but I'm hoping there's an easier/better way.
 
 (defmacro elm-get (self elm-name)
-  (if (eq? self 'self)
-      `(((/elm-make-method-getter ,self ,elm-name)) ,self)
-      `(elm-xget ,self ,elm-name))
-)
-
-;; Subroutine of elm-set!.
-
-(define (/elm-make-method-setter self elm-name)
-  (/object-check self "elm-set!")
-  (let ((index (/class-lookup-element (/object-class-desc self) elm-name)))
-    (if index
-	(procedure->memoizing-macro
-	 (lambda (exp env)
-	   `(lambda (obj new-val)
-	      (/object-elm-set! obj ,index new-val))))
-	(/object-error "elm-set!" self "element not present: " elm-name)))
-)
+  `(elm-xget ,self ,elm-name))
 
 ;; Set an element in an object.
 ;; This can only be used by methods.
 ;; See the comments for `elm-get'!
 
 (defmacro elm-set! (self elm-name new-val)
-  (if (eq? self 'self)
-      `(((/elm-make-method-setter ,self ,elm-name)) ,self ,new-val)
-      `(elm-xset! ,self ,elm-name ,new-val))
-)
+  `(elm-xset! ,self ,elm-name ,new-val))
 
 ;; Get an element from an object.
 ;; This is for invoking from outside a method, and without having to
