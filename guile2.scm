@@ -4,7 +4,7 @@
 ; See file COPYING.CGEN for details.
 
 (use-modules
- (ice-9 exceptions)
+ ;;(ice-9 exceptions)
  (system repl common))
 
 (define *guile-major-version* (string->number (major-version)))
