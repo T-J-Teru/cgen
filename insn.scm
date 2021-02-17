@@ -321,7 +321,7 @@
 	  )
 
 	(begin
-	  logit 3 "    failed ifield assertions.\n")))
+	  (logit 3 "    failed ifield assertions.\n"))))
 
   *UNSPECIFIED*
 )

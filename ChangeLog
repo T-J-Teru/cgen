@@ -1,3 +1,7 @@
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	* insn.scm (/sub-insn-make!): Wrap call to logit in brackets.
+
 2021-02-01  Mike Frysinger  <vapier@gentoo.org>
 
 	* sim-decode.scm (TRACE_EXTRACT): Rename to ...
