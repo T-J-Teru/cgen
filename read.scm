@@ -124,37 +124,37 @@
 
 ;; Load the base cgen files.
 
-(load "pmacros")
-(load "cos")
-(load "slib/logical")
-(load "slib/sort")
+(include-from-path "pmacros.scm")
+(include-from-path "cos.scm")
+(include-from-path "slib/logical.scm")
+(include-from-path "slib/sort.scm")
 ;; Used to pretty-print debugging messages.
-(load "slib/pp")
+(include-from-path "slib/pp.scm")
 ;; Used by pretty-print.
-(load "slib/random")
-(load "slib/genwrite")
-(load "utils")
-(load "utils-cgen")
-(load "attr")
-(load "enum")
-(load "mach")
-(load "model")
-(load "types")
-(load "mode")
-(load "ifield")
-(load "iformat")
-(load "hardware")
-(load "operand")
-(load "insn")
-(load "minsn")
-(load "decode")
+(include-from-path "slib/random.scm")
+(include-from-path "slib/genwrite.scm")
+(include-from-path "utils.scm")
+(include-from-path "utils-cgen.scm")
+(include-from-path "attr.scm")
+(include-from-path "enum.scm")
+(include-from-path "mach.scm")
+(include-from-path "model.scm")
+(include-from-path "types.scm")
+(include-from-path "mode.scm")
+(include-from-path "ifield.scm")
+(include-from-path "iformat.scm")
+(include-from-path "hardware.scm")
+(include-from-path "operand.scm")
+(include-from-path "insn.scm")
+(include-from-path "minsn.scm")
+(include-from-path "decode.scm")
 
 (display "APB: Now the hard part...\n")
 
 
-(load "rtl")
-(load "rtl-traverse")
-(load "rtl-xform")
+(include-from-path "rtl.scm")
+(include-from-path "rtl-traverse.scm")
+(include-from-path "rtl-xform.scm")
 
 ;; START DEBUG CODE
 ;;(set! /rtx-func-table (make-hash-table 127))
@@ -164,15 +164,15 @@
 ;; At the repl, run: (define-rtx-macro-node (regno reg) (list 'index-of reg))
 ;; END DEBUG CODE
 
-(load "rtx-funcs")
+(include-from-path "rtx-funcs.scm")
 
 ;; (debug-repl nil)
 
-(load "rtl-c")
-(load "semantics")
-(load "sem-frags")
-(load "utils-gen")
-(load "pgmr-tools")
+(include-from-path "rtl-c.scm")
+(include-from-path "semantics.scm")
+(include-from-path "sem-frags.scm")
+(include-from-path "utils-gen.scm")
+(include-from-path "pgmr-tools.scm")
 
 (display "APB: All loading done\n")
 
@@ -273,11 +273,11 @@
    current-cpu commands location))
 
 (define (reader-add-command! name comment attrs arg-spec handler)
-  (reader-set-commands! CURRENT-READER
-			(acons name
-			       (make <command> name comment attrs
-				     arg-spec handler)
-			       (reader-commands CURRENT-READER)))
+  (let ([cmd (make <command> name comment attrs arg-spec handler)])
+    (message "APB: In reader-add-command! name = " name "\n")
+    (message "APB: reader is: " CURRENT-READER "\n")
+    (let ([curr (reader-commands CURRENT-READER)])
+      (reader-set-commands! CURRENT-READER (acons name cmd curr))))
 )
 
 (define (/reader-lookup-command name)
@@ -911,31 +911,50 @@
 ;; The "result" is stored in global CURRENT-READER.
 
 (define (/init-reader!)
+  (message "APB: /init-reader! <1>\n")
   (set! CURRENT-READER (new <reader>))
+
+  (message "APB: /init-reader! <2>\n")
 
   (set! /CGEN-RTL-VERSION /default-rtl-version)
 
+  (message "APB: /init-reader! <3>\n")
+
   (set! /continuable-error-found? #f)
+
+  (message "APB: /init-reader! <4>\n")
 
   (reader-add-command! 'define-rtl-version
 		       "Specify the RTL version being used.\n"
 		       nil '(major minor) /cmd-define-rtl-version)
 
+  (message "APB: /init-reader! <5>\n")
+
   (reader-add-command! 'include
 		       "Include a file.\n"
 		       nil '(file) /cmd-include)
+
+  (message "APB: /init-reader! <6>\n")
+
   (reader-add-command! 'if
 		       "(if test then . else)\n"
 		       nil '(test then . else) /cmd-if)
 
+  (message "APB: /init-reader! <7>\n")
+
   ;; Rather than add cgen-internal specific stuff to pmacros.scm, we create
   ;; the pmacro commands here.
   (pmacros-init! /default-rtl-version)
+
+  (message "APB: /init-reader! <8>\n")
+
   (reader-add-command! 'define-pmacro
 		       "\
 Define a preprocessor-style macro.
 "
 		       nil '(name arg1 . arg-rest) define-pmacro)
+
+  (message "APB: /init-reader! <9>\n")
 
   *UNSPECIFIED*
 )
@@ -1115,11 +1134,17 @@ Define a preprocessor-style macro.
 (define (cpu-load file keep-mach keep-isa options
 		  trace-options diagnostic-options
 		  app-initer! app-finisher! analyzer!)
+  (message "APB: cpu-load, file = " file "\n")
   (/init-reader!)
+  (message "APB: cpu-load <2>\n")
   (/init-parse-cpu! keep-mach keep-isa options)
+  (message "APB: cpu-load <3>\n")
   (/set-trace-options! trace-options)
+  (message "APB: cpu-load <4>\n")
   (/set-diagnostic-options! diagnostic-options)
+  (message "APB: cpu-load <5>\n")
   (app-initer!)
+  (message "APB: cpu-load <6>\n")
   (logit 1 "Loading cpu description " file " ...\n")
   (logit 1 "machs:   " keep-mach "\n")
   (logit 1 "isas:    " keep-isa "\n")
@@ -1401,25 +1426,35 @@ Define a preprocessor-style macro.
 
 	;; All arguments have been parsed.
 
-	(cgen-call-with-debugging
-	 debugging
-	 (lambda ()
+	;;(cgen-call-with-debugging
+        ;;debugging
+        ;;(lambda ()
+
+        (display "APB: <90>\n")
 
 	   (if (not arch-file)
 	       (error "-a option missing, no architecture specified"))
 
+        (display "APB: <91>\n")
+
 	   (if repl?
 	       (debug-repl nil))
 
-	   (cpu-load arch-file
-		     keep-mach keep-isa flags
-		     trace-options diagnostic-options
-		     app-init! app-finish! app-analyze!)
+        (display "APB: <92>\n")
+
+        (cpu-load arch-file
+                  keep-mach keep-isa flags
+                  trace-options diagnostic-options
+                  app-init! app-finish! app-analyze!)
+
+        (display "APB: <93>\n")
 
 	   ;; Start another repl loop if -d.
 	   ;; Awkward.  Both places are useful, though this is more useful.
 	   (if repl?
 	       (debug-repl nil))
+
+        (display "APB: <94>\n")
 
 	   ;; Done with processing the arguments.  Application arguments
 	   ;; are processed in two passes.  This is because the app may
@@ -1434,13 +1469,20 @@ Define a preprocessor-style macro.
 			     ((opt-get-first-pass opt)))))
 		     (reverse app-args))
 
+        (display "APB: <95>\n")
+
 	   (for-each (lambda (opt-arg)
 		       (let ((opt (car opt-arg))
 			     (arg (cdr opt-arg)))
 			 (if (cadr opt)
 			     ((opt-get-second-pass opt) arg)
 			     ((opt-get-second-pass opt)))))
-		     (reverse app-args))))
+		     (reverse app-args))
+
+        (display "APB: <96>\n")
+
+           ;;)
+         ;;)
 	)
       )
     #f) ;; end of lambda

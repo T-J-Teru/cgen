@@ -28,9 +28,15 @@
     symbol-bound?)
 )
 
-(define (load file)
-  (primitive-load-path file)
-)
+(display "APB: About to (re)define load\n")
+;;(define (load file)
+  ;;(primitive-load-path file))
+;;(define-syntax load
+;;  (syntax-rules ()
+;;    ((load file)
+;;     (include file))))
+
+(display "APB: Done (re)define load\n")
 
 ; FIXME: to be deleted
 (define =? =)
@@ -112,58 +118,58 @@
 ;;; (On systems other than Guile, this doesn't really need to do
 ;;; anything other than apply PROC to ARGS, as long as something
 ;;; ensures that backtraces will work right.)
-(define (cgen-debugging-stack-start proc args)
-
-  ;; Naming this procedure, rather than using an anonymous lambda,
-  ;; allows us to pass less fragile cut info to save-stack.
-  (define (handler . args)
-    (display "APB: In exception handler\n\n\n")
-    (display args (current-error-port))
-    ;;(newline (current-error-port))
-    ;; display-error takes 6 arguments.
-    ;; If `quit' is called from elsewhere, it may not have 6
-    ;; arguments.  Not sure how best to handle this.
-    (if (= (length args) 5)
-        (begin
-          (apply display-error #f (current-error-port) (cdr args))
-          ;; Grab a copy of the current stack,
-          (save-stack handler 0)
-          (backtrace)))
-    (quit 1))
-
-  (define (handler2 exception)
-    (display
-     (simple-format
-      #f "warning?: ~a\n" (warning? exception)))
-    (display
-     (simple-format
-      #f "exception?: ~a\n" (exception? exception)))
-    (display
-     (simple-format
-      #f "exception-with-message?: ~a\n"
-      (exception-with-message? exception)))
-    (display
-     (simple-format
-      #f "exception-message: ~a\n"
-      (exception-message exception)))
-    (display
-     (simple-format
-      #f "exception: ~a\n" exception)))
-
-;;  ;; Apply proc to args, and if any uncaught exception is thrown, call
-;;  ;; handler WITHOUT UNWINDING THE STACK (that's the 'lazy' part).  We
-;;  ;; need the stack left alone so we can produce a backtrace.
-;;  (with-exception-handler
-;;   handler2
-;;   (lambda ()
-;;     (display "In THUNK...\n\n\n")
-;;     (display args)
-;;     (newline)
-;;     ;; I have no idea why the 'load-stack' stack mark is
-;;     ;; not still present on the stack; we're still loading
-;;     ;; cgen-APP.scm, aren't we?  But stack-id returns #f
-;;     ;; in handler if we don't do a start-stack here.
-;;     (start-stack proc (apply proc args)))))
-
-  (display "\n\n\nTODO: In guile2.scm, exception handling code was removed!!!\n\n\n")
-  (apply proc args))
+;; (define (cgen-debugging-stack-start proc args)
+;; 
+;;   ;; Naming this procedure, rather than using an anonymous lambda,
+;;   ;; allows us to pass less fragile cut info to save-stack.
+;;   (define (handler . args)
+;;     (display "APB: In exception handler\n\n\n")
+;;     (display args (current-error-port))
+;;     ;;(newline (current-error-port))
+;;     ;; display-error takes 6 arguments.
+;;     ;; If `quit' is called from elsewhere, it may not have 6
+;;     ;; arguments.  Not sure how best to handle this.
+;;     (if (= (length args) 5)
+;;         (begin
+;;           (apply display-error #f (current-error-port) (cdr args))
+;;           ;; Grab a copy of the current stack,
+;;           (save-stack handler 0)
+;;           (backtrace)))
+;;     (quit 1))
+;; 
+;;   (define (handler2 exception)
+;;     (display
+;;      (simple-format
+;;       #f "warning?: ~a\n" (warning? exception)))
+;;     (display
+;;      (simple-format
+;;       #f "exception?: ~a\n" (exception? exception)))
+;;     (display
+;;      (simple-format
+;;       #f "exception-with-message?: ~a\n"
+;;       (exception-with-message? exception)))
+;;     (display
+;;      (simple-format
+;;       #f "exception-message: ~a\n"
+;;       (exception-message exception)))
+;;     (display
+;;      (simple-format
+;;       #f "exception: ~a\n" exception)))
+;; 
+;; ;;  ;; Apply proc to args, and if any uncaught exception is thrown, call
+;; ;;  ;; handler WITHOUT UNWINDING THE STACK (that's the 'lazy' part).  We
+;; ;;  ;; need the stack left alone so we can produce a backtrace.
+;; ;;  (with-exception-handler
+;; ;;   handler2
+;; ;;   (lambda ()
+;; ;;     (display "In THUNK...\n\n\n")
+;; ;;     (display args)
+;; ;;     (newline)
+;; ;;     ;; I have no idea why the 'load-stack' stack mark is
+;; ;;     ;; not still present on the stack; we're still loading
+;; ;;     ;; cgen-APP.scm, aren't we?  But stack-id returns #f
+;; ;;     ;; in handler if we don't do a start-stack here.
+;; ;;     (start-stack proc (apply proc args)))))
+;; 
+;;   (display "\n\n\nTODO: In guile2.scm, exception handling code was removed!!!\n\n\n")
+;;   (apply proc args))

@@ -9,19 +9,19 @@
 
 ; Load the various support routines.
 
-(define (load-files srcdir)
-  (display "APB: Loading read.scm\n")
-  (load (string-append srcdir "/read.scm"))
-  (display "APB: Loading desc.scm\n")
-  (load (string-append srcdir "/desc.scm"))
-  (display "APB: Loading desc-cpu.scm\n")
-  (load (string-append srcdir "/desc-cpu.scm"))
-  (load (string-append srcdir "/opcodes.scm"))
-  (load (string-append srcdir "/opc-asmdis.scm"))
-  (load (string-append srcdir "/opc-ibld.scm"))
-  (load (string-append srcdir "/opc-itab.scm"))
-  (load (string-append srcdir "/opc-opinst.scm"))
-)
+;; (define (load-files srcdir)
+;;   (display "APB: Loading read.scm\n")
+;;   (load (string-append srcdir "/read.scm"))
+;;   (display "APB: Loading desc.scm\n")
+;;   (load (string-append srcdir "/desc.scm"))
+;;   (display "APB: Loading desc-cpu.scm\n")
+;;   (load (string-append srcdir "/desc-cpu.scm"))
+;;   (load (string-append srcdir "/opcodes.scm"))
+;;   (load (string-append srcdir "/opc-asmdis.scm"))
+;;   (load (string-append srcdir "/opc-ibld.scm"))
+;;   (load (string-append srcdir "/opc-itab.scm"))
+;;   (load (string-append srcdir "/opc-opinst.scm"))
+;; )
 
 (define opc-arguments
   (list
@@ -95,22 +95,67 @@
 
     ; Find and set srcdir, then load all Scheme code.
     ; Drop the first argument, it is the script name (i.e. argv[0]).
-    (set! srcdir (find-srcdir (cdr argv)))
-    (set! %load-path (cons srcdir %load-path))
-    (display "APB: load files...\n")
-    (load-files srcdir)
+;;    (set! srcdir (find-srcdir (cdr argv)))
+;;    (set! %load-path (cons srcdir %load-path))
+;;    (display "APB: load files from `")
+;;    (display srcdir)
+;;    (display "'\n")
+;;    (load-files srcdir)
 
     (display "APB: Displaying argv...\n")
 
     (display-argv argv)
 
-    (cgen #:argv argv
-	  #:app-name "opcodes"
-	  #:arg-spec opc-arguments
-	  #:init opcodes-init!
-	  #:finish opcodes-finish!
-	  #:analyze opcodes-analyze!)
+    (/cgen #:argv argv
+           #:app-name "opcodes"
+           #:arg-spec opc-arguments
+           #:init opcodes-init!
+           #:finish opcodes-finish!
+           #:analyze opcodes-analyze!)
     )
-)
+  )
+
+
+(eval-when
+ (expand load eval)
+ (begin
+(define srcdir ".")
+
+(define (find-srcdir argv)
+  (let loop ((argv argv))
+    (if (null? argv)
+	(error "`-s srcdir' not present, can't load cgen"))
+    (if (string=? "-s" (car argv))
+	(begin
+	  (if (null? (cdr argv))
+	      (error "missing srcdir arg to `-s'"))
+	  (cadr argv))
+	(loop (cdr argv)))))
+
+ (define (xxx argv)
+   (set! srcdir (find-srcdir (cdr argv)))
+   (set! %load-path (cons srcdir %load-path))
+   (display "APB: load files from `")
+   (display srcdir)
+   (display "'\n")
+ (display "APB: %load-path: ")
+ (display %load-path)
+ (display "\n"))))
+
+(eval-when (expand load eval)
+  (xxx (program-arguments)))
+
+(display "APB: Loading read.scm\n")
+(include "read.scm")
+(display "APB: Loading desc.scm\n")
+(include "desc.scm")
+(display "APB: Loading desc-cpu.scm\n")
+(include "desc-cpu.scm")
+(include "opcodes.scm")
+(include "opc-asmdis.scm")
+(include "opc-ibld.scm")
+(include "opc-itab.scm")
+(include "opc-opinst.scm")
+
 
 (cgen-opc (program-arguments))

@@ -6,6 +6,8 @@
 ; This file is loaded in during an interactive guile session to
 ; develop and debug CGEN.
 
+(error "not used")
+
 ; First load guile.scm to coerce guile into something we've been using.
 ; Guile is always in flux.
 (load "guile.scm")
