@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* rtx-funcs.scm (def-rtx-funcs): Don't try to let-bind macros,
+	instead use long form macro names throughout.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* insn.scm (/sub-insn-make!): Wrap call to logit in brackets.
 
 2021-02-01  Mike Frysinger  <vapier@gentoo.org>
