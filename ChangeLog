@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* cos.scm (/object-vector-copy): Convert to a single top-level
+	define.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* pgmr-tools.scm (pgmr-lookup-insn): Ensure local defines occur
 	before the function body.
 

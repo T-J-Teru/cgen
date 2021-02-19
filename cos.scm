@@ -1263,11 +1263,7 @@
 
 ;; Misc. internal utilities.
 
-;; We need a fast vector copy operation.
-;; If `vector-copy' doesn't exist (which is assumed to be the fast one),
-;; provide a simple version.
+;; An alias for `vector-copy', which is assume to be the fastest way
+;; to copy a vector.
 
-(if (defined? 'vector-copy)
-    (define /object-vector-copy vector-copy)
-    (define (/object-vector-copy v) (list->vector (vector->list v)))
-)
+(define /object-vector-copy vector-copy)
