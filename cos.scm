@@ -267,16 +267,6 @@
 	 x)
 )
 
-;; Utility to count the number of non-#f elements in FLAGS.
-
-(define (/object-count-true flags)
-  (let loop ((result 0) (flags flags))
-    (if (null? flags)
-	result
-	(loop (+ result (if (car flags) 1 0))
-	      (cdr flags))))
-)
-
 ;; If S is a symbol, convert it to a string.
 ;; Otherwise S must be a string, returned unchanged.
 
@@ -756,94 +746,6 @@
       #f)
 )
 
-;; Subroutine of define-class.
-;; Parse a define-class member list and return a list of five elements:
-;; - list of all members
-;; - list of public readable members
-;; - list of public writable members
-;; - list of private readable members
-;; - list of private writable members
-;; MEMBER-SPEC is a list of members, with private members prefixed with '/',
-;; and writable members prefixed with '!'.  / and ! may appear in any order.
-;; Each element is either member-name or (member-name . initial-value).
-
-(define (/parse-member-list member-spec)
-  (let loop ((member-spec member-spec)
-	     (members nil)
-	     (public-readable nil)
-	     (public-writable nil)
-	     (private-readable nil)
-	     (private-writable nil))
-    (if (null? member-spec)
-	(list (reverse! members)
-	      (reverse! public-readable)
-	      (reverse! public-writable)
-	      (reverse! private-readable)
-	      (reverse! private-writable))
-	(let* ((spec (car member-spec))
-	       (sym (if (pair? spec) (car spec) spec))
-	       (str (symbol->string sym)))
-	  (let ((private? (string-index str #\/))
-		(writable? (string-index str #\!)))
-	    ;; ??? Assumes /,! are first characters.
-	    (let* ((stripped-str (substring str (/object-count-true (list private? writable?))))
-		   (stripped-sym (string->symbol stripped-str)))
-	      (loop (cdr member-spec)
-		    ;; Combine initial value if present.
-		    (cons (if (pair? spec)
-			      (cons stripped-sym (cdr spec))
-			      stripped-sym)
-			  members)
-		    (if (not private?)
-			(cons stripped-sym public-readable)
-			public-readable)
-		    (if (and (not private?) writable?)
-			(cons stripped-sym public-writable)
-			public-writable)
-		    (if private?
-			(cons stripped-sym private-readable)
-			private-readable)
-		    (if (and private? writable?)
-			(cons stripped-sym private-writable)
-			private-writable)))))))
-)
-
-;; Subroutine of define-class.
-;; Return a list of definitions of member getters.
-
-(define (/build-getter-defs class prefix members private?)
-  (let ((str-prefix (symbol->string prefix)))
-    (cons 'begin
-	  (map (lambda (m)
-		 (let* ((elm-name (if (pair? m) (car m) m))
-			(name (string-append (if private? "/" "")
-					     str-prefix
-					     (symbol->string elm-name)))
-			(getter-name (string->symbol name)))
-		   `(define ,getter-name
-		      (elm-make-getter ,class (quote ,elm-name)))))
-	       members)))
-)
-
-;; Subroutine of define-class.
-;; Return a list of definitions of member getters.
-
-(define (/build-setter-defs class prefix members private?)
-  (let ((str-prefix (symbol->string prefix)))
-    (cons 'begin
-	  (map (lambda (m)
-		 (let* ((elm-name (if (pair? m) (car m) m))
-			(name (string-append (if private? "/" "")
-					     str-prefix
-					     "set-"
-					     (symbol->string elm-name)
-					     "!"))
-			(getter-name (string->symbol name)))
-		   `(define ,getter-name
-		      (elm-make-setter ,class (quote ,elm-name)))))
-	       members)))
-)
-
 ;; Main routine to define a class.
 ;;
 ;; This defines several things:
@@ -858,6 +760,105 @@
 ;; By convention name is formatted as <class-name>.
 
 (defmacro define-class (name prefix parents members)
+
+  ;; Utility to count the number of non-#f elements in FLAGS.
+
+  (define (/object-count-true flags)
+    (let loop ((result 0) (flags flags))
+      (if (null? flags)
+          result
+          (loop (+ result (if (car flags) 1 0))
+                (cdr flags))))
+  )
+
+  ;; Subroutine of define-class.
+  ;; Parse a define-class member list and return a list of five elements:
+  ;; - list of all members
+  ;; - list of public readable members
+  ;; - list of public writable members
+  ;; - list of private readable members
+  ;; - list of private writable members
+  ;; MEMBER-SPEC is a list of members, with private members prefixed with '/',
+  ;; and writable members prefixed with '!'.  / and ! may appear in any order.
+  ;; Each element is either member-name or (member-name . initial-value).
+
+  (define (/parse-member-list member-spec)
+    (let loop ((member-spec member-spec)
+               (members nil)
+               (public-readable nil)
+               (public-writable nil)
+               (private-readable nil)
+               (private-writable nil))
+      (if (null? member-spec)
+          (list (reverse! members)
+                (reverse! public-readable)
+                (reverse! public-writable)
+                (reverse! private-readable)
+                (reverse! private-writable))
+          (let* ((spec (car member-spec))
+                 (sym (if (pair? spec) (car spec) spec))
+                 (str (symbol->string sym)))
+            (let ((private? (string-index str #\/))
+                  (writable? (string-index str #\!)))
+              ;; ??? Assumes /,! are first characters.
+              (let* ((stripped-str (substring str (/object-count-true (list private? writable?))))
+                     (stripped-sym (string->symbol stripped-str)))
+                (loop (cdr member-spec)
+                      ;; Combine initial value if present.
+                      (cons (if (pair? spec)
+                                (cons stripped-sym (cdr spec))
+                                stripped-sym)
+                            members)
+                      (if (not private?)
+                          (cons stripped-sym public-readable)
+                          public-readable)
+                      (if (and (not private?) writable?)
+                          (cons stripped-sym public-writable)
+                          public-writable)
+                      (if private?
+                          (cons stripped-sym private-readable)
+                          private-readable)
+                      (if (and private? writable?)
+                          (cons stripped-sym private-writable)
+                          private-writable)))))))
+  )
+
+  ;; Subroutine of define-class.
+  ;; Return a list of definitions of member getters.
+
+  (define (/build-getter-defs class prefix members private?)
+    (let ((str-prefix (symbol->string prefix)))
+      (cons 'begin
+            (map (lambda (m)
+                   (let* ((elm-name (if (pair? m) (car m) m))
+                          (name (string-append (if private? "/" "")
+                                               str-prefix
+                                               (symbol->string elm-name)))
+                          (getter-name (string->symbol name)))
+                     `(define ,getter-name
+                        (elm-make-getter ,class (quote ,elm-name)))))
+                 members)))
+  )
+
+  ;; Subroutine of define-class.
+  ;; Return a list of definitions of member getters.
+
+  (define (/build-setter-defs class prefix members private?)
+    (let ((str-prefix (symbol->string prefix)))
+      (cons 'begin
+            (map (lambda (m)
+                   (let* ((elm-name (if (pair? m) (car m) m))
+                          (name (string-append (if private? "/" "")
+                                               str-prefix
+                                               "set-"
+                                               (symbol->string elm-name)
+                                               "!"))
+                          (getter-name (string->symbol name)))
+                     `(define ,getter-name
+                        (elm-make-setter ,class (quote ,elm-name)))))
+                 members)))
+  )
+
   (let* ((parsed-members (/parse-member-list members))
 	 (str-name (symbol->string name))
 	 (str-name-len (string-length str-name))

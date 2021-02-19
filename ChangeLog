@@ -1,5 +1,12 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* cos.scm (/object-count-true): Move inside define-class macro.
+	(/parse-member-list): Likewise.
+	(/build-getter-defs): Likewise.
+	(/build-setter-defs): Likewise.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* cos.scm (/object-vector-copy): Convert to a single top-level
 	define.
 
