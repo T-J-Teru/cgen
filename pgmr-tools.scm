@@ -156,9 +156,6 @@
 ; LENGTH is the total length of VALUE in bits.
 
 (define (pgmr-lookup-insn length value)
-  (arch-analyze-insns! CURRENT-ARCH
-		       #t ; include aliases
-		       #f) ; don't need to analyze semantics
 
   ; Return a boolean indicating if BASE matches the base part of <insn> INSN.
   (define (match-base base insn)
@@ -170,14 +167,19 @@
   (define (match-rest value insn)
     #t)
 
-  (let ((base (if (list? value) (car value) value)))
-    (let loop ((insns (current-insn-list)))
-      (if (null? insns)
-	  #f
-	  (let ((insn (car insns)))
-	    (if (and (= length (insn-length insn))
-		     (match-base base insn)
-		     (match-rest value insn))
-		insn
-		(loop (cdr insns)))))))
+  (begin
+    (arch-analyze-insns! CURRENT-ARCH
+                         #t ; include aliases
+                         #f) ; don't need to analyze semantics
+
+    (let ((base (if (list? value) (car value) value)))
+      (let loop ((insns (current-insn-list)))
+        (if (null? insns)
+            #f
+            (let ((insn (car insns)))
+              (if (and (= length (insn-length insn))
+                       (match-base base insn)
+                       (match-rest value insn))
+                  insn
+                  (loop (cdr insns))))))))
 )
