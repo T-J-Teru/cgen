@@ -11,7 +11,12 @@
 ; - the prefix "gen-" comes from cgen's convention that procs that return C
 ;   code, and only those procs, are prefixed with "gen-"
 
-(define nil '())
+;; For guile 2+ `nil' is required to be defined during the macro
+;; expansion and compilation phase, as well as during the general
+;; evaluation phase.
+(eval-when (expand load eval)
+  (define nil '())
+)
 
 ; Hobbit support code; for when not using hobbit.
 ; FIXME: eliminate this stuff ASAP.

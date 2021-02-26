@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* guile.scm (eval-when): New macro.
+	* utils.scm (nil): Wrap in `eval-when' macro.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* cos.scm (/object-count-true): Move inside define-class macro.
 	(/parse-member-list): Likewise.
 	(/build-getter-defs): Likewise.

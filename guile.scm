@@ -150,3 +150,13 @@
 		;; in handler if we don't do a start-stack here.
 		(start-stack proc (apply proc args)))
 	      handler))
+
+;; To support transitioning to later versions of guile define
+;; `eval-when', so that these calls can be added to the rest of CGEN
+;; without tripping up guile 1.8.x.
+;;
+;; As guile 1.8.x doesn't have the same phased execution model as
+;; guile 2+, `eval-when' just unconditionally executes the body in all
+;; cases.
+(defmacro eval-when (states body)
+  body)
