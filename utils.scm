@@ -486,17 +486,11 @@
 		(backslash chars (cdr str)))))
 )
 
-; Return a boolean indicating if S is bound to a value.
-;(define old-symbol-bound? symbol-bound?)
-;(define (symbol-bound? s) (old-symbol-bound? #f s))
-
 ; Return a boolean indicating if S is a symbol and is bound to a value.
 
 (define (bound-symbol? s)
   (and (symbol? s)
-       (or (symbol-bound? #f s)
-	   ;(module-bound? cgen-module s)
-	   ))
+       (module-defined? (current-module) s))
 )
 
 ; Return X.
