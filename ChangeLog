@@ -1,5 +1,15 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* guile.scm (symbol-bound?): Delete.
+	(load): Always redefine.
+	(%stat): Likewise.
+	(reverse!): Delete.
+	(debug-enable 'backtrace): Call unconditionally.
+	* utils.scm: Delete commented out code relating to symbol-bound?.
+	(bound-symbol?): Use module-defined directly.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* guile.scm (eval1): Unconditionally define as we no longer
 	support versions of guile before 1.8.
 
