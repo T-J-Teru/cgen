@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* guile.scm (eval1): Unconditionally define as we no longer
+	support versions of guile before 1.8.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* guile.scm (eval-when): New macro.
 	* utils.scm (nil): Wrap in `eval-when' macro.
 
