@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* guile.scm: Don't try to set debug features that have been
+	removed in guile 2+.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* guile.scm (symbol-bound?): Delete.
 	(load): Always redefine.
 	(%stat): Likewise.
