@@ -6,15 +6,10 @@
 (define *guile-major-version* (string->number (major-version)))
 (define *guile-minor-version* (string->number (minor-version)))
 
-; eval takes a module argument in 1.6 and later
-
-(if (or (> *guile-major-version* 1)
-	(>= *guile-minor-version* 6))
-    (define (eval1 expr)
-      (eval expr (current-module)))
-    (define (eval1 expr)
-      (eval expr))
-)
+; A version of eval that only takes 1 argument and evaluates it in the
+; current module.
+(define (eval1 expr)
+  (eval expr (current-module)))
 
 ; symbol-bound? is deprecated in 1.6
 
