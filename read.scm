@@ -100,24 +100,6 @@
 
 (define (/rtl-version-valid? version) (member version /supported-rtl-versions))
 
-(define (/cmd-define-rtl-version major minor)
-  (if (not (non-negative-integer? major))
-      (parse-error #f "Invalid major version number" major))
-  (if (not (non-negative-integer? minor))
-      (parse-error #f "Invalid minor version number" minor))
-
-  (let ((new-version (list major minor)))
-    (if (not (member new-version /supported-rtl-versions))
-	(parse-error #f "Unsupported/invalid rtl version" new-version))
-    (if (not (equal? new-version /CGEN-RTL-VERSION))
-	(begin
-	  (logit 1 "Setting RTL version to " major "." minor " ...\n")
-	  ;; Pmacros are rtl-version-dependent.  If we've changed the RTL
-	  ;; version, re-initialize.
-	  (pmacros-init! new-version)
-	  (set! /CGEN-RTL-VERSION new-version))))
-)
-
 ;; Which application is in use (UNKNOWN, DESC, OPCODES, SIMULATOR, ???).
 ;; This is mostly for descriptive purposes.
 (define APPLICATION 'UNKNOWN)
@@ -158,6 +140,26 @@
 (load "utils-gen")
 (load "pgmr-tools")
 
+
+(define (/cmd-define-rtl-version major minor)
+  (if (not (non-negative-integer? major))
+      (parse-error #f "Invalid major version number" major))
+  (if (not (non-negative-integer? minor))
+      (parse-error #f "Invalid minor version number" minor))
+
+  (let ((new-version (list major minor)))
+    (if (not (member new-version /supported-rtl-versions))
+	(parse-error #f "Unsupported/invalid rtl version" new-version))
+    (if (not (equal? new-version /CGEN-RTL-VERSION))
+	(begin
+	  (logit 1 "Setting RTL version to " major "." minor " ...\n")
+	  ;; Pmacros are rtl-version-dependent.  If we've changed the RTL
+	  ;; version, re-initialize.
+	  (pmacros-init! new-version)
+	  (set! /CGEN-RTL-VERSION new-version))))
+)
+
+
 ;; Reader state data.
 ;; All state regarding the reading of a .cpu file is kept in an object of
 ;; class <reader>.

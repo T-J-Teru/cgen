@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* read.scm (/cmd-define-rtl-version): Move to after utils.scm has
+	been loaded.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* read.scm (/cgen): Use provided? not feature?.
 
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
