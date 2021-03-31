@@ -1,5 +1,12 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* cos.scm (/elm-make-method-getter): Delete.
+	(elm-get): Remove use of /elm-make-method-getter.
+	(/elm-make-method-setter): Delete.
+	(elm-set!): Remove use of /elm-make-method-setter.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* rtl.scm (define-rtx-node): Rewrite as a macro without the use of
 	defmacro:syntax-transformer.
 	(define-rtx-syntax-node): Likewise.
