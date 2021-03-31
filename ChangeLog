@@ -1,5 +1,13 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* rtl.scm (define-rtx-node): Rewrite as a macro without the use of
+	defmacro:syntax-transformer.
+	(define-rtx-syntax-node): Likewise.
+	(define-rtx-operand-node): Likewise.
+	(define-rtx-macro-node): Likewise.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* guile.scm: Don't try to set debug features that have been
 	removed in guile 2+.
 
