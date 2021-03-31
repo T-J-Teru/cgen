@@ -2,5 +2,9 @@
 (define *guile-minor-version* (string->number (minor-version)))
 
 (if (= *guile-major-version* 1)
-    (load "guile1.scm")
-    (load "guile2.scm"))
+    (begin
+      (display "APB: Loading guile1.scm\n\n")
+      (load "guile1.scm"))
+    (begin
+      (display "APB: Loading guile2.scm\n\n")
+      (load "guile2.scm")))
