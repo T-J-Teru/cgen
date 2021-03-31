@@ -1321,7 +1321,7 @@ Define a preprocessor-style macro.
 		      (let ((prompt (string-append "cgen-" app-name "> ")))
 			(set! repl? #t)
 			(set-repl-prompt! prompt)
-			(if (feature? 'readline)
+			(if (provided? 'readline)
 			    (set-readline-prompt! prompt))
 			))
 		     ((str=? "-f" (car opt))
