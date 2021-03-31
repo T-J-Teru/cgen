@@ -109,21 +109,15 @@
 		;; If `quit' is called from elsewhere, it may not have 6
 		;; arguments.  Not sure how best to handle this.
 		(if (= (length args) 5)
-		    (begin
-		      (apply display-error #f (current-error-port) (cdr args))
-		      ;; Grab a copy of the current stack,
-		      (save-stack handler 0)
-		      (backtrace)))
+                    (apply display-error #f (current-error-port) (cdr args)))
+                (let ((s (make-stack #t)))
+                  (display-backtrace s (current-error-port)))
 		(quit 1))
 
   ;; Apply proc to args, and if any uncaught exception is thrown, call
   ;; handler WITHOUT UNWINDING THE STACK (that's the 'lazy' part).  We
   ;; need the stack left alone so we can produce a backtrace.
-  (lazy-catch #t
+  (with-throw-handler #t
 	      (lambda ()
-		;; I have no idea why the 'load-stack' stack mark is
-		;; not still present on the stack; we're still loading
-		;; cgen-APP.scm, aren't we?  But stack-id returns #f
-		;; in handler if we don't do a start-stack here.
-		(start-stack proc (apply proc args)))
+		(apply proc args))
 	      handler))
