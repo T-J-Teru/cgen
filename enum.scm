@@ -252,57 +252,53 @@
      "/* Enum declaration for " comment ".  */\n"
      "typedef enum "
      (string-downcase (gen-c-symbol name))
-     " {")
-    (let loop ((n 0) ; `n' is used to track the number of entries per line only
-	       (sequential? (enum-sequential? vals))
-	       (vals vals)
-	       (result (list "")))
-      (if (null? vals)
-	  result
-	  (let* ((e (car vals))
-		 (attrs (if (null? (cdr e)) nil (cddr e)))
-		 (san-code (attr-value attrs 'sanitize #f))
-		 (san? (and san-code (not (eq? san-code 'none)))))
-	    (loop
-	     (if san?
-		 4 ; reset to beginning of line (but != 0)
-		 (+ n 1))
-	     sequential?
-	     (cdr vals)
-	     (append!
-	      result
-	      (string-list
-	       (if (and san? include-sanitize-marker?)
-		   ; split string to avoid removal
-		   (string-append "\n/* start-"
-				  "sanitize-"
-				  san-code " */")
-		   "")
-	       (if (or san? (=? (remainder n 4) 0))
-		   "\n "
-		   "")
-	       (if (= n 0)
-		   " "
-		   ", ")
-	       (string-upcase (gen-c-symbol prefix))
-	       (string-upcase (gen-c-symbol (car e)))
-	       (if (or sequential?
-		       (null? (cdr e))
-		       (eq? '- (cadr e)))
-		   ""
-		   (string-append " = "
-				  (if (number? (cadr e))
-				      (if (>= (cadr e) #x80000000)
-					  (string-append "0x"
-						(number->string (cadr e) 16))
-					  (number->string (cadr e)))
-				      (string-upcase (cadr e)))))
-	       (if (and san? include-sanitize-marker?)
-		   ; split string to avoid removal
-		   (string-append "\n/* end-"
-				  "sanitize-" san-code " */")
-		   "")))))))
-    (string-list
+     " {"
+     (let loop ((n 0) ; `n' is used to track the number of entries per line only
+                (sequential? (enum-sequential? vals))
+                (vals vals)
+                (result ""))
+       (if (null? vals)
+           result
+           (let* ((e (car vals))
+                  (attrs (if (null? (cdr e)) nil (cddr e)))
+                  (san-code (attr-value attrs 'sanitize #f))
+                  (san? (and san-code (not (eq? san-code 'none)))))
+             (loop
+              (if san?
+                  4 ; reset to beginning of line (but != 0)
+                  (+ n 1))
+              sequential?
+              (cdr vals)
+              (string-append
+               result
+               (if (and san? include-sanitize-marker?)
+                   ; split string to avoid removal
+                   (string-append "\n/* start-sanitize-" san-code " */")
+                   "")
+               (if (or san? (=? (remainder n 4) 0))
+                   "\n "
+                   "")
+               (if (= n 0)
+                   " "
+                   ", ")
+               (string-upcase (gen-c-symbol prefix))
+               (string-upcase (gen-c-symbol (car e)))
+               (if (or sequential?
+                       (null? (cdr e))
+                       (eq? '- (cadr e)))
+                   ""
+                   (string-append " = "
+                                  (if (number? (cadr e))
+                                      (if (>= (cadr e) #x80000000)
+                                          (string-append "0x"
+                                                         (number->string
+                                                          (cadr e) 16))
+                                          (number->string (cadr e)))
+                                      (string-upcase (cadr e)))))
+               (if (and san? include-sanitize-marker?)
+                   ;; split string to avoid removal
+                   (string-append "\n/* end-sanitize-" san-code " */")
+                   ""))))))
      "\n} "
      (string-upcase (gen-c-symbol name))
      ";\n\n")

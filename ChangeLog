@@ -1,5 +1,10 @@
 2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
 
+	* enum.scm (gen-enum-decl): Build a string, rather than a string
+	list, within the recursive core of this function.
+
+2021-02-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
 	* read.scm (/cmd-define-rtl-version): Move to after utils.scm has
 	been loaded.
 
