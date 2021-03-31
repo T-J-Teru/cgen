@@ -1,0 +1,12 @@
+This development brach allows guile 2+ to be used in compilation mode,
+and will successfully regenerate the binutils opcodes files.
+
+I've not done any testing for regenerating the simulator (yet).
+
+The lessons learned in this branch have allowed me to create a
+transitional state where guile 2+ can be run in non-compilation mode,
+and will still work for guile 1.8+ and 2+.  Once that work has been
+upstreamed then I can rebase this branch and see what, if any changes
+from this branch should still be pushed upstream.
+
+For now this branch is considered parked.
